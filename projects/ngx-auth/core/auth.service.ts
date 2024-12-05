@@ -2,7 +2,8 @@ import { inject, Injectable, NgZone, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import {
     AccessToken, AuthSubscription, AuthUtils, IdToken, LoginArgs, LogoutArgs, OIDCAuthManager,
-    RenewArgs, UserProfile, UserSession
+    RenewArgs, User,
+    UserProfile, UserSession
 } from '@badisi/auth-js/oidc';
 import { Observable, ReplaySubject } from 'rxjs';
 import { distinctUntilChanged, map } from 'rxjs/operators';
@@ -18,6 +19,7 @@ export class AuthService implements OnDestroy {
     #ngZone = inject(NgZone);
     #router = inject(Router);
 
+    #user$: ReplaySubject<User | null | undefined> = new ReplaySubject<User | null | undefined>(1);
     #idToken$: ReplaySubject<string | undefined> = new ReplaySubject<string | undefined>(1);
     #accessToken$: ReplaySubject<string | undefined> = new ReplaySubject<string | undefined>(1);
     #userProfile$: ReplaySubject<UserProfile | undefined> = new ReplaySubject<UserProfile | undefined>(1);
@@ -36,6 +38,11 @@ export class AuthService implements OnDestroy {
     }
 
     /* eslint-disable @typescript-eslint/member-ordering */
+    public readonly user$: Observable<User | null | undefined> =
+        this.#user$.asObservable().pipe(
+            distinctUntilChanged()
+        );
+
     public readonly isRenewing$: Observable<boolean> =
         this.#isRenewing$.asObservable().pipe(
             distinctUntilChanged()
@@ -102,6 +109,10 @@ export class AuthService implements OnDestroy {
         return this.#manager.renew(args);
     }
 
+    public async removeUser(): Promise<void> {
+        return this.#manager.removeUser();
+    }
+
     /**
      * @see {@link OIDCAuthManager.getSettings}
      */
@@ -121,6 +132,13 @@ export class AuthService implements OnDestroy {
      */
     public async isAuthenticated(): Promise<boolean> {
         return this.#manager.isAuthenticated();
+    }
+
+    /**
+     * @see {@link OIDCAuthManager.getUser}
+     */
+    public async getUser(): Promise<User | null | undefined> {
+        return this.#manager.getUser();
     }
 
     /**
@@ -169,6 +187,7 @@ export class AuthService implements OnDestroy {
 
     #listenForManagerChanges(): void {
         this.#authManagerSubs.push(
+            this.#manager.onUserChanged(value => this.#ngZone.run(() => this.#user$.next(value))),
             this.#manager.onIdTokenChanged(value => this.#ngZone.run(() => this.#idToken$.next(value))),
             this.#manager.onAccessTokenChanged(value => this.#ngZone.run(() => this.#accessToken$.next(value))),
             this.#manager.onUserProfileChanged(value => this.#ngZone.run(() => this.#userProfile$.next(value))),
