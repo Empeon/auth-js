@@ -1,4 +1,4 @@
-import { OIDCAuthSettings } from '@badisi/auth-js/oidc';
+import { OIDCAuthSettings } from '@empeon/auth-js/oidc';
 
 export type InjectTokenPattern = (string | RegExp)[] | ((url: string) => boolean);
 

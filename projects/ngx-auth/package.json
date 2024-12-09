@@ -1,13 +1,13 @@
 {
-    "name": "@badisi/ngx-auth",
-    "version": "0.0.0-semantically-released",
+    "name": "@empeon/ngx-auth",
+    "version": "1.0.0",
     "description": "Authentication and authorization support for Angular based desktop and mobile applications.",
-    "homepage": "https://github.com/Badisi/auth-js/tree/main/projects/ngx-auth",
+    "homepage": "https://github.com/Empeon/auth-js/tree/main/projects/ngx-auth",
     "license": "GPL-3.0-only",
-    "author": "Badisi",
+    "author": "Empeon",
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/Badisi/auth-js.git"
+        "url": "git+https://github.com/Empeon/auth-js.git"
     },
     "keywords": [
         "angular",
@@ -35,7 +35,7 @@
         "build": "cd ../../ && nx run ngx-auth:build && nx run ngx-auth:copy-assets && nx run ngx-auth:build-schematics"
     },
     "dependencies": {
-        "@badisi/auth-js": "0.0.0-semantically-released",
+        "@empeon/auth-js": "1.0.0",
         "@hug/ngx-schematics-utilities": "^10.1.2",
         "tslib": "^2.7.0"
     },
@@ -46,7 +46,8 @@
         "rxjs": "^6.5.3 || ^7.4.0"
     },
     "publishConfig": {
-        "access": "public"
+        "access": "restricted",
+        "registry": "https://npm.pkg.github.com"
     },
     "schematics": "./schematics/collection.json",
     "ng-add": {

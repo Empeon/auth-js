@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import {
     AccessToken, AuthSubscription, AuthUtils, IdToken, LoginArgs, LogoutArgs, OIDCAuthManager,
     RenewArgs, UserProfile, UserSession
-} from '@badisi/auth-js/oidc';
+} from '@empeon/auth-js/oidc';
 import { Observable, ReplaySubject } from 'rxjs';
 import { distinctUntilChanged, map } from 'rxjs/operators';
 

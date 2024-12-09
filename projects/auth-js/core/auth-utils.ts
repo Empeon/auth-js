@@ -14,7 +14,7 @@ export class AuthUtils {
             }
             return value;
         } catch {
-            console.warn('[@badisi/auth-js] Access token was not decoded as it is not a valid JWT.');
+            console.warn('[@empeon/auth-js] Access token was not decoded as it is not a valid JWT.');
             return value;
         }
     };

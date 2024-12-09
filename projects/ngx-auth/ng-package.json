@@ -3,7 +3,7 @@
     "dest": "../../dist/ngx-auth",
     "allowedNonPeerDependencies": [
         "@hug/ngx-schematics-utilities",
-        "@badisi/auth-js"
+        "@empeon/auth-js"
     ],
     "lib": {
         "entryFile": "./index.ts"

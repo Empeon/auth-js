@@ -352,7 +352,7 @@ export class OIDCAuthManager extends AuthManager<OIDCAuthSettings> {
         // eslint-disable-next-line no-loops/no-loops
         while (this.#isRenewing) {
             if (Date.now() > (startTime + 5000)) {
-                console.warn('[@badisi/auth-js]', `\`${caller}\``, 'timed out waiting for renew to finish.');
+                console.warn('[@empeon/auth-js]', `\`${caller}\``, 'timed out waiting for renew to finish.');
                 break;
             }
             await new Promise(resolve => setTimeout(resolve, 100));

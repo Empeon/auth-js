@@ -5,7 +5,7 @@ import {
     ActivatedRouteSnapshot, CanActivate, CanActivateChild, CanLoad, Data, Route, Router,
     RouterStateSnapshot, UrlTree
 } from '@angular/router';
-import { AccessToken, UserProfile } from '@badisi/auth-js/oidc';
+import { AccessToken, UserProfile } from '@empeon/auth-js/oidc';
 import { forkJoin, from, isObservable, Observable, of } from 'rxjs';
 import { catchError, map, switchMap, take } from 'rxjs/operators';
 

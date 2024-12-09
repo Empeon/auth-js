@@ -1,12 +1,12 @@
 {
-    "name": "@badisi/auth-js",
+    "name": "@empeon/auth-js",
     "description": "Authentication and authorization support for web based desktop and mobile applications.",
-    "homepage": "https://github.com/Badisi/auth-js",
+    "homepage": "https://github.com/Empeon/auth-js",
     "license": "GPL-3.0-only",
-    "author": "Badisi",
+    "author": "Empeon",
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/Badisi/auth-js.git"
+        "url": "git+https://github.com/Empeon/auth-js.git"
     },
     "keywords": [
         "authentication",

@@ -1,13 +1,13 @@
 {
-    "name": "@badisi/auth-js",
-    "version": "0.0.0-semantically-released",
+    "name": "@empeon/auth-js",
+    "version": "1.0.0",
     "description": "Authentication and authorization support for web based desktop and mobile applications.",
-    "homepage": "https://github.com/Badisi/auth-js/tree/main/projects/auth-js",
+    "homepage": "https://github.com/Empeon/auth-js/tree/main/projects/auth-js",
     "license": "GPL-3.0-only",
-    "author": "Badisi",
+    "author": "Empeon",
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/Badisi/auth-js.git"
+        "url": "git+https://github.com/Empeon/auth-js.git"
     },
     "keywords": [
         "ionic",
@@ -44,7 +44,8 @@
         "@types/cordova": "^11.0.3"
     },
     "publishConfig": {
-        "access": "public"
+        "access": "restricted",
+        "registry": "https://npm.pkg.github.com"
     },
     "exports": {
         "./core": {

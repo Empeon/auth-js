@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
 import { InjectionToken, StaticProvider } from '@angular/core';
-import { initOidc, Optional } from '@badisi/auth-js/oidc';
+import { initOidc, Optional } from '@empeon/auth-js/oidc';
 
 import { AuthSettings } from './auth-settings.model';
 

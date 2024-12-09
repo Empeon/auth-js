@@ -6,10 +6,10 @@
  * Copyright (C) 2018 Badisi
  */
 
-export { Log, AuthUtils, UserSession, DesktopNavigation } from '@badisi/auth-js/oidc';
+export { Log, AuthUtils, UserSession, DesktopNavigation } from '@empeon/auth-js/oidc';
 export type {
     UserProfile, AccessToken, IdToken, MobileWindowParams, LoginArgs, LogoutArgs, RenewArgs, SigninMobileArgs, SignoutMobileArgs
-} from '@badisi/auth-js/oidc';
+} from '@empeon/auth-js/oidc';
 
 export type { AuthSettings, InjectToken, InjectTokenPattern } from './auth-settings.model';
 export type { AuthGuardValidator, AuthGuardData } from './auth.guard';

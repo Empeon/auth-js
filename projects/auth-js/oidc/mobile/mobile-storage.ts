@@ -19,7 +19,7 @@ export class MobileStorage implements AsyncStorage {
 
     constructor() {
         if (!CAPACITOR_SECURE_STORAGE) {
-            let message = '[@badisi/auth-js] This application is currently using an unsafe storage.\n\n';
+            let message = '[@empeon/auth-js] This application is currently using an unsafe storage.\n\n';
             message += 'ⓘ Please follow the recommended guide and use `capacitor-secure-storage-plugin` instead.';
             console.warn(message);
         }

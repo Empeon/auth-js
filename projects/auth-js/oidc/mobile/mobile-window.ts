@@ -33,25 +33,25 @@ export class MobileWindow implements IWindow {
         public params: MobileWindowParams
     ) {
         if (!AuthUtils.isCapacitor() && !AuthUtils.isCordova()) {
-            let message = '[@badisi/auth-js] Required core dependency not found.\n\n';
+            let message = '[@empeon/auth-js] Required core dependency not found.\n\n';
             message += 'ⓘ Please follow the recommended guide and install either `Capacitor` or `Cordova` dependency.';
             console.error(message);
         }
 
         if (!BROWSER_TAB && !CAPACITOR_BROWSER) {
-            let message = '[@badisi/auth-js] Required plugin not found.\n\n';
-            message += 'ⓘ Please follow the recommended guide and install either `@badisi/capacitor-browsertab` or `@capacitor/browser` plugin.';
+            let message = '[@empeon/auth-js] Required plugin not found.\n\n';
+            message += 'ⓘ Please follow the recommended guide and install either `@empeon/capacitor-browsertab` or `@capacitor/browser` plugin.';
             console.error(message);
         }
 
         /* TODO: if (!BROWSER_TAB && CAPACITOR_BROWSER) {
-            let message = '[@badisi/auth-js] This application is currently using a non recommended browser plugin.\n\n';
-            message += 'ⓘ Please follow the recommended guide and use `@badisi/capacitor-browsertab` instead.';
+            let message = '[@empeon/auth-js] This application is currently using a non recommended browser plugin.\n\n';
+            message += 'ⓘ Please follow the recommended guide and use `@empeon/capacitor-browsertab` instead.';
             console.warn(message);
         }*/
 
         if (BROWSER_TAB) {
-            this._logger.debug('Using `@badisi/capacitor-browsertab` implementation');
+            this._logger.debug('Using `@empeon/capacitor-browsertab` implementation');
         } else if (CAPACITOR_BROWSER) {
             this._logger.debug('Using `@capacitor/browser` implementation');
         }

@@ -2,7 +2,7 @@
     "name": "ngx-auth",
     "$schema": "../../node_modules/nx/schemas/project-schema.json",
     "sourceRoot": "projects/ngx-auth",
-    "prefix": "badisi",
+    "prefix": "empeon",
     "projectType": "library",
     "tags": [],
     "targets": {

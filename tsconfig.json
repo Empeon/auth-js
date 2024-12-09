@@ -19,16 +19,16 @@
         "skipDefaultLibCheck": true,
         "baseUrl": ".",
         "paths": {
-            "@badisi/auth-js": [
+            "@empeon/auth-js": [
                 "projects/auth-js"
             ],
-            "@badisi/auth-js/*": [
+            "@empeon/auth-js/*": [
                 "projects/auth-js/*"
             ],
-            "@badisi/ngx-auth": [
+            "@empeon/ngx-auth": [
                 "projects/ngx-auth"
             ],
-            "@badisi/ngx-auth/*": [
+            "@empeon/ngx-auth/*": [
                 "projects/ngx-auth/*"
             ],
             "demo-app-common": [
