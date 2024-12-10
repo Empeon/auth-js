@@ -6,17 +6,16 @@
  * Copyright (C) 2018 Badisi
  */
 
-export { Log, AuthUtils, UserSession, DesktopNavigation } from '@empeon/auth-js/oidc';
-export type {
-    UserProfile, AccessToken, IdToken, MobileWindowParams, LoginArgs, LogoutArgs, RenewArgs, SigninMobileArgs, SignoutMobileArgs
-} from '@empeon/auth-js/oidc';
+export { AuthUtils, DesktopNavigation, Log, User, UserSession } from '@empeon/auth-js/oidc';
+export type { AccessToken, IdToken, LoginArgs, LogoutArgs, MobileWindowParams, RenewArgs, SigninMobileArgs, SignoutMobileArgs, UserProfile } from '@empeon/auth-js/oidc';
 
 export type { AuthSettings, InjectToken, InjectTokenPattern } from './auth-settings.model';
-export type { AuthGuardValidator, AuthGuardData } from './auth.guard';
+export type { AuthGuardData, AuthGuardValidator } from './auth.guard';
 
-export { AuthInterceptor } from './auth.interceptor';
-export { AuthService } from './auth.service';
-export { provideAuth } from './auth.provider';
-export { AuthModule } from './auth.module';
-export { AuthGuard } from './auth.guard';
 export { initAuth } from './auth';
+export { AuthGuard } from './auth.guard';
+export { AuthInterceptor } from './auth.interceptor';
+export { AuthModule } from './auth.module';
+export { provideAuth } from './auth.provider';
+export { AuthService } from './auth.service';
+
