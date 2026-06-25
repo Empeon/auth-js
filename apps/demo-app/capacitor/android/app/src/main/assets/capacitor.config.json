@@ -1,9 +1,0 @@
-{
-    "appId": "demoapp",
-    "appName": "demo-app",
-    "loggingBehavior": "debug",
-    "server": {
-        "url": "http://10.0.2.2:4200",
-        "cleartext": true
-    }
-}

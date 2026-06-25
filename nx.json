@@ -92,10 +92,7 @@
                     "targetName": "build",
                     "configName": "tsconfig.lib.json"
                 }
-            },
-            "exclude": [
-                "apps/demo-app/web/common/*"
-            ]
+            }
         },
         {
             "plugin": "@nx/eslint/plugin",

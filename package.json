@@ -25,25 +25,18 @@
     ],
     "private": true,
     "scripts": {
-        "ncu": "npx npm-check-updates -i --format=group --packageFile='{,apps/**/,libs/**/}package.json'",
+        "ncu": "npx npm-check-updates -i --format=group --packageFile='{,libs/**/}package.json'",
         "migrate:nx": "nx migrate latest",
-        "migrate:cap": "cap migrate",
         "lint": "eslint .",
-        "test:ci": "nx run-many --target=test:ci --projects=auth-js,auth-vue,ngx-auth --output-style=static",
-        "build": "nx run-many --target=build:nx --projects=auth-js,auth-vue,ngx-auth --output-style=static --verbose",
+        "test:ci": "nx run-many --target=test:ci --projects=auth-js,ngx-auth --output-style=static",
+        "build": "nx run-many --target=build:nx --projects=auth-js,ngx-auth --output-style=static --verbose",
         "release": "node ./scripts/release.mjs --verbose",
         "release:dry-run": "npm run release -- --dry-run",
         "postinstall": "patch-package",
         "prepare": "husky || true"
     },
     "workspaces": [
-        "apps/demo-app/capacitor",
-        "apps/demo-app/web",
-        "apps/demo-e2e",
-        "apps/demo-idp",
-        "apps/website",
         "libs/auth-js",
-        "libs/auth-vue",
         "libs/ngx-auth"
     ],
     "dependencies": {
@@ -54,8 +47,6 @@
         "@angular/platform-browser": "20.3.13",
         "@angular/router": "20.3.13",
         "rxjs": "7.8.2",
-        "vue": "3.5.24",
-        "vue-router": "4.6.3",
         "zone.js": "~0.15.0"
     },
     "devDependencies": {
