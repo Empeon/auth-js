@@ -41,6 +41,9 @@ Thumbs.db
 # Claude Code local config
 .claude/
 
+# npm auth (contains registry tokens)
+.npmrc
+
 .nx/cache
 .nx/workspace-data
 
