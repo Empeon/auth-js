@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/unbound-method */
 
-import { AuthLogger } from '@badisi/auth-js';
+import { AuthLogger } from '@empeon/auth-js';
 import type { OidcMetadata } from 'oidc-client-ts';
 
 import type { InjectToken } from './models/inject-token.model';

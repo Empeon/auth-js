@@ -38,6 +38,9 @@ testem.log
 .DS_Store
 Thumbs.db
 
+# Claude Code local config
+.claude/
+
 .nx/cache
 .nx/workspace-data
 

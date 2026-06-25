@@ -3,7 +3,7 @@ import {
     type ActivatedRouteSnapshot, type CanActivateFn, type CanMatchFn, type GuardResult, type Route, Router,
     type RouterStateSnapshot, type UrlSegment
 } from '@angular/router';
-import type { AuthGuardOptions } from '@badisi/auth-js/oidc';
+import type { AuthGuardOptions } from '@empeon/auth-js/oidc';
 
 import { AuthService } from './auth.service';
 

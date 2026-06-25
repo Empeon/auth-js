@@ -1,5 +1,5 @@
 import { type EnvironmentProviders, InjectionToken, makeEnvironmentProviders, type StaticProvider } from '@angular/core';
-import { initOidc, type OIDCAuthManager } from '@badisi/auth-js/oidc';
+import { initOidc, type OIDCAuthManager } from '@empeon/auth-js/oidc';
 
 import type { AuthSettings } from '.';
 

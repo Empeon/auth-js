@@ -1,16 +1,16 @@
 <div align="center">
 
-# @badisi/ngx-auth
+# @empeon/ngx-auth
 
 🛡️ Authentication and authorization support for Angular based desktop and mobile applications.
 
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)][pullrequest]
 [![docs site](https://img.shields.io/badge/site-docs-ed6e55)][docs-site]
 [![playground site](https://img.shields.io/badge/site-playground-ed6e55)][playground-site]
-[![license](https://img.shields.io/npm/l/@badisi/ngx-auth.svg?color=ff69b4)][license]
+[![license](https://img.shields.io/npm/l/@empeon/ngx-auth.svg?color=ff69b4)][license]
 
-[![npm version](https://img.shields.io/npm/v/@badisi/ngx-auth.svg?color=blue&logo=npm)][npm]
-[![npm downloads](https://img.shields.io/npm/dw/@badisi/ngx-auth.svg?color=7986CB&logo=npm)][npm-dl]
+[![npm version](https://img.shields.io/npm/v/@empeon/ngx-auth.svg?color=blue&logo=npm)][npm]
+[![npm downloads](https://img.shields.io/npm/dw/@empeon/ngx-auth.svg?color=7986CB&logo=npm)][npm-dl]
 [![build status](https://img.shields.io/github/actions/workflow/status/badisi/auth-js/ci_test_ngx-auth.yml?logo=github)][ci-tests]
 
 </div>
@@ -45,8 +45,8 @@ Please read and follow the [Code of Conduct][codeofconduct] and help me keep thi
 
 
 
-[npm]: https://www.npmjs.com/package/@badisi/ngx-auth
-[npm-dl]: https://npmcharts.com/compare/@badisi/ngx-auth?minimal=true
+[npm]: https://www.npmjs.com/package/@empeon/ngx-auth
+[npm-dl]: https://npmcharts.com/compare/@empeon/ngx-auth?minimal=true
 [ci-tests]: https://github.com/Badisi/auth-js/actions/workflows/ci_test_ngx-auth.yml
 [pullrequest]: https://github.com/Badisi/auth-js/blob/main/CONTRIBUTING.md#-submitting-a-pull-request-pr
 [license]: https://github.com/Badisi/auth-js/blob/main/LICENSE

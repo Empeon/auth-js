@@ -118,7 +118,7 @@
     "release": {
         "projectsRelationship": "independent",
         "releaseTag": {
-            "pattern": "@badisi/{projectName}@{version}"
+            "pattern": "@empeon/{projectName}@{version}"
         },
         "version": {
             "conventionalCommits": true

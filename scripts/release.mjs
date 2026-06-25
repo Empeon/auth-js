@@ -61,7 +61,7 @@ const exec = (message, cmd, args, options, newLine = false) => {
  *  Currently `nx release` does not allow to easily change the folder to be published.
  *
  *  `nx.json#targetDefaults.nx-release-publish.options.packageRoot` could be used but can only interpolate:
- *  - {projectName}: which resolved to '@badisi/abc' (ie. package.json#name)
+ *  - {projectName}: which resolved to '@empeon/abc' (ie. package.json#name)
  *  - {projectRoot}: which resolved to 'libs/abc'
  *  And what we need is actually `abc` because Angular generates projects in `dist/abc`.
  *  So to make it work, we use the hidden option (__overrides_unparsed__) and publish each project individually.
@@ -295,8 +295,8 @@ void (async () => {
      *   4. Stage changed files with git
      *   5. Commit all previously staged files in git
      *        chore(release): update projects versions [skip ci]
-     *        - project: \@badisi/abc 1.2.3
-     *        - project: \@badisi/xyz 4.5.6
+     *        - project: \@empeon/abc 1.2.3
+     *        - project: \@empeon/xyz 4.5.6
      */
     let updates = await updateProjectsVersions('chore(release): update projects versions [skip ci]', options);
 
@@ -307,7 +307,7 @@ void (async () => {
      *      - Update npm lock file
      *      - Stage changed files with git
      *      - Commit all previously staged files in git
-     *          deps(@badisi/abc): upgrade to v1.2.3
+     *          deps(@empeon/abc): upgrade to v1.2.3
      *          [skip ci]
      *   7. Push to git remote
      */
@@ -328,8 +328,8 @@ void (async () => {
      *  11. Stage changed files with git
      *  12. Commit all previously staged files in git
      *        chore(release): re-update projects versions [skip ci]
-     *        - project: \@badisi/abc 1.2.3
-     *        - project: \@badisi/xyz 4.5.6
+     *        - project: \@empeon/abc 1.2.3
+     *        - project: \@empeon/xyz 4.5.6
      */
     if (needReUpdate && options.projects?.length !== 1) {
         updates = await updateProjectsVersions('chore(release): re-update projects versions [skip ci]', options);
@@ -340,11 +340,11 @@ void (async () => {
      *  14. Stage changed files with git
      *  15. Commit all previously staged files in git
      *        chore(release): update projects changelogs [skip ci]
-     *        - project: \@badisi/abc 1.2.3
-     *        - project: \@badisi/xyz 4.5.6
+     *        - project: \@empeon/abc 1.2.3
+     *        - project: \@empeon/xyz 4.5.6
      *  16. Tag commit with git
-     *        + \@badisi/abc@1.2.3
-     *        + \@badisi/xyz@5.6.7
+     *        + \@empeon/abc@1.2.3
+     *        + \@empeon/xyz@5.6.7
      *  17. Push to git remote
      *  18. Create GitHub releases
      */

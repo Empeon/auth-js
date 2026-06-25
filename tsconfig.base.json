@@ -18,13 +18,13 @@
         "skipLibCheck": true,
         "skipDefaultLibCheck": true,
         "paths": {
-            "@badisi/auth-js": [
+            "@empeon/auth-js": [
                 "libs/auth-js/core"
             ],
-            "@badisi/auth-js/oidc": [
+            "@empeon/auth-js/oidc": [
                 "libs/auth-js/oidc"
             ],
-            "@badisi/ngx-auth": [
+            "@empeon/ngx-auth": [
                 "libs/ngx-auth"
             ]
         }

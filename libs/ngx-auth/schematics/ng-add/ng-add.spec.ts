@@ -67,7 +67,7 @@ const eac = expect.arrayContaining.bind(this);
                 const angularJson = tree.readJson('angular.json');
                 const asset = {
                     glob: '**/*',
-                    input: 'node_modules/@badisi/ngx-auth/oidc/assets',
+                    input: 'node_modules/@empeon/ngx-auth/oidc/assets',
                     output: 'oidc/callback'
                 };
                 expect(angularJson).toEqual(eoc({
@@ -98,11 +98,11 @@ const eac = expect.arrayContaining.bind(this);
                 const mainTsContent = tree.readContent(project.pathFromSourceRoot('main.ts'));
                 const useDynamic = mainTsContent.includes('platformBrowserDynamic');
                 if (useStandalone) {
-                    expect(mainTsContent).toContain('import { initAuth, provideAuth } from \'@badisi/ngx-auth\';');
+                    expect(mainTsContent).toContain('import { initAuth, provideAuth } from \'@empeon/ngx-auth\';');
                     expect(mainTsContent).toContain(STANDALONE_CONTENT);
                     expect(mainTsContent).not.toContain(MODULE_CONTENT(useDynamic));
                 } else {
-                    expect(mainTsContent).toContain('import { initAuth } from \'@badisi/ngx-auth\';');
+                    expect(mainTsContent).toContain('import { initAuth } from \'@empeon/ngx-auth\';');
                     expect(mainTsContent).toContain(MODULE_CONTENT(useDynamic));
                     expect(mainTsContent).not.toContain(STANDALONE_CONTENT);
                     expect(mainTsContent).not.toContain('provideAuth');
@@ -116,11 +116,11 @@ const eac = expect.arrayContaining.bind(this);
                 const angularJsonPath = 'angular.json';
                 const angularJsonContent = tree.read(angularJsonPath)?.toString('utf-8') ?? '';
                 expect(occurrences(angularJsonContent, 'crypto-js')).toEqual(1);
-                expect(occurrences(angularJsonContent, 'node_modules/@badisi/ngx-auth/oidc/assets')).toEqual(2);
+                expect(occurrences(angularJsonContent, 'node_modules/@empeon/ngx-auth/oidc/assets')).toEqual(2);
 
                 const mainTsPath = project.pathFromSourceRoot('main.ts');
                 const mainTsContent = tree.read(mainTsPath)?.toString('utf-8') ?? '';
-                expect(occurrences(mainTsContent, '@badisi/ngx-auth')).toEqual(1);
+                expect(occurrences(mainTsContent, '@empeon/ngx-auth')).toEqual(1);
                 expect(occurrences(mainTsContent, 'initAuth')).toEqual(2);
                 expect(occurrences(mainTsContent, 'provideAuth')).toEqual(useStandalone ? 2 : 0);
             });

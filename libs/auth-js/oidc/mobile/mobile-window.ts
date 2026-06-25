@@ -40,19 +40,19 @@ export class MobileWindow implements IWindow {
 
         if (!BROWSER_TAB && !CAPACITOR_BROWSER) {
             // TODO:
-            // logger.notif('ⓘ Please follow the installation guide and install either `@badisi/capacitor-browsertab` or `@capacitor/browser` plugin.');
+            // logger.notif('ⓘ Please follow the installation guide and install either `@empeon/capacitor-browsertab` or `@capacitor/browser` plugin.');
             logger.notif('ⓘ Please follow the installation guide and install `@capacitor/browser` plugin.');
             throw logger.getError('Required browser plugin not found');
         }
 
         /* TODO: if (!BROWSER_TAB && CAPACITOR_BROWSER) {
-            let message = '[@badisi/auth-js] This application is currently using a non recommended browser plugin.\n\n';
-            message += 'ⓘ Please follow the recommended guide and use `@badisi/capacitor-browsertab` instead.';
+            let message = '[@empeon/auth-js] This application is currently using a non recommended browser plugin.\n\n';
+            message += 'ⓘ Please follow the recommended guide and use `@empeon/capacitor-browsertab` instead.';
             console.warn(message);
         }*/
 
         if (BROWSER_TAB) {
-            logger.debug('Using `@badisi/capacitor-browsertab` implementation');
+            logger.debug('Using `@empeon/capacitor-browsertab` implementation');
         } else if (CAPACITOR_BROWSER) {
             logger.debug('Using `@capacitor/browser` implementation');
         }

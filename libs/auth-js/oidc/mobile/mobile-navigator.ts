@@ -1,4 +1,4 @@
-import { AuthLogger } from '@badisi/auth-js';
+import { AuthLogger } from '@empeon/auth-js';
 
 import type { MobileWindowParams } from '../models/mobile-window-params.model';
 import { MobileWindow } from './mobile-window';
