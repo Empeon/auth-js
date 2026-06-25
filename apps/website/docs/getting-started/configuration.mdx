@@ -1,0 +1,79 @@
+---
+title: Configuration
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+
+:::note
+Draft document..
+:::
+
+## AuthSettings
+
+### `authorityUrl*`
+> **type**: string<br/>
+> **required**
+
+### `clientId*`
+> **type**: string<br/>
+> **required**
+
+### `mobileScheme*`
+> **type**: string<br/>
+> **required**
+
+### `loginRequired`
+> **type**: boolean<br/>
+> **default**: false
+
+### `loadUserInfo`
+> **type**: boolean<br/>
+> **default**: false
+
+### `retrieveUserSession`
+> **type**: boolean<br/>
+> **default**: true
+
+### `automaticSilentRenew`
+> **type**: boolean<br/>
+> **default**: true
+
+### `automaticLoginOn401`
+> **type**: boolean<br/>
+> **default**: true
+
+### `automaticInjectToken`
+> **type**: boolean or custom object<br/>
+> **default**: any hostname or pathname that starts with 'api'
+
+```ts title="Custom object example"
+automaticInjectToken: {
+  headerName: 'Authorization',
+  include: (url: string): boolean => url?.includes('user'),
+  exclude: [
+    '/public-api',
+    /^\/my-custom-api\/.*$/gm
+  ]
+}
+```
+
+### `authGuardFallbackUrl`
+> **type**: string<br/>
+> **default**: undefined
+
+### `scope`
+> **type**: string<br/>
+> **default**: "openid profile email phone"
+
+### `desktopNavigationType`
+> **type**: enum - *DesktopNavigation.(REDIRECT, POPUP)*<br/>
+> **default**: REDIRECT
+
+### `logLevel`
+> **type**: enum - *Log.(NONE, ERROR, WARN, INFO, DEBUG)*<br/>
+> **default**: NONE
+
+### `internal`
+> **type**: [UserManagerSettings](https://authts.github.io/oidc-client-ts/interfaces/UserManagerSettings.html)<br/>

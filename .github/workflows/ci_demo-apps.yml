@@ -1,0 +1,53 @@
+name: Deploy demo-apps
+
+on:
+    workflow_dispatch:
+    push:
+        branches:
+            - main
+        tags-ignore:
+            - '**'
+        paths:
+            - '.github/workflows/ci_demo-apps.yml'
+            - 'apps/demo-app/**'
+            - 'libs/**'
+
+env:
+    HUSKY: 0
+
+concurrency:
+    group: deploy-demo-apps-group-${{ github.ref }}
+    cancel-in-progress: true
+
+jobs:
+    ci_demo-apps:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Setup
+              uses: badisi/actions/setup@v4
+
+            - name: Build demo-app:auth-js
+              working-directory: apps/demo-app/web
+              env:
+                  BASE_URL: /${{ github.event.repository.name }}/demo-app/auth-js/
+              run: npm run build:auth-js -- --base-href=${{ env.BASE_URL }} --deploy-url=${{ env.BASE_URL }}
+
+            - name: Build demo-app:ngx-auth
+              working-directory: apps/demo-app/web
+              env:
+                  BASE_URL: /${{ github.event.repository.name }}/demo-app/ngx-auth/
+              run: npm run build:ngx-auth -- --base-href=${{ env.BASE_URL }} --deploy-url=${{ env.BASE_URL }}
+
+            - name: Build demo-app:auth-vue
+              working-directory: apps/demo-app/web
+              env:
+                  BASE_URL: /${{ github.event.repository.name }}/demo-app/auth-vue/
+              run: npm run build:auth-vue
+
+            - name: Deploy to GitHub Pages
+              uses: peaceiris/actions-gh-pages@v4
+              with:
+                  commit_message: 'deploy(demo-apps):'
+                  github_token: ${{ secrets.GITHUB_TOKEN }}
+                  publish_dir: ./dist/demo-app
+                  destination_dir: demo-app

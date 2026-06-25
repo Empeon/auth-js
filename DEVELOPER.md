@@ -28,9 +28,9 @@ You can test the library while developing it, as follow:
 
 2. Make any modifications
 
-   * to the **library**: in `projects/library/src/`
-   * to the **testing application**: in `projects/tests-app/src/`
-   * to the **tests**: in `projects/tests/harness.e2e.ts`
+   * to the **library**: in `libs/library/src/`
+   * to the **testing application**: in `libs/tests-app/src/`
+   * to the **tests**: in `libs/tests/harness.e2e.ts`
 
 3. Run the test
 
@@ -52,8 +52,8 @@ This project comes with automatic continuous delivery (CD) using *GitHub Actions
 
 1. Bump the library version in `./package.json`
 2. Push the changes
-3. Create a new: [GitHub release](https://github.com/badisi/auth-js/releases/new)
-4. Watch the results in: [Actions](https://github.com/badisi/auth-js/actions)
+3. Create a new: [GitHub release](https://github.com/Badisi/auth-js/releases/new)
+4. Watch the results in: [Actions](https://github.com/Badisi/auth-js/actions)
 
 
 
