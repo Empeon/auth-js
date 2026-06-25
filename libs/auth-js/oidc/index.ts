@@ -41,3 +41,4 @@ export type { UserSession } from './models/user-session.model';
 export { OIDCAuthManager } from './oidc-auth-manager';
 export { OIDCAuthService } from './oidc-auth-service';
 export type { UserProfile } from 'oidc-client-ts';
+export { User } from 'oidc-client-ts';

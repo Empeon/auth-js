@@ -29,6 +29,7 @@ import { OIDCUserManager } from './oidc-user-manager';
 const logger = new AuthLogger('OIDCAuthManager');
 
 export class OIDCAuthManager extends AuthManager<OIDCAuthSettings> {
+    #userSubs = new AuthSubscriptions<User | null | undefined>();
     #idTokenSubs = new AuthSubscriptions<string | undefined>();
     #accessTokenSubs = new AuthSubscriptions<string | undefined>();
     #userProfileSubs = new AuthSubscriptions<UserProfile | undefined>();
@@ -67,6 +68,7 @@ export class OIDCAuthManager extends AuthManager<OIDCAuthSettings> {
             } : undefined;
             this.#isAuthenticated = !!(value && !value.expired);
 
+            this.#userSubs.notify(this.#user);
             this.#idTokenSubs.notify(this.#idToken);
             this.#accessTokenSubs.notify(this.#accessToken);
             this.#userProfileSubs.notify(this.#userProfile);
@@ -247,6 +249,19 @@ export class OIDCAuthManager extends AuthManager<OIDCAuthSettings> {
         return authGuard.validate(toUrl, options);
     }
 
+    public async getUser(): Promise<User | null | undefined> {
+        await this.#waitForRenew('getUser()');
+        return this.#user;
+    }
+
+    public async storeUser(user: User): Promise<void> {
+        await this.#userManager?.storeUser(user);
+    }
+
+    public async removeUser(): Promise<void> {
+        await this.#removeUser();
+    }
+
     public async getUserProfile(): Promise<UserProfile | undefined> {
         await this.#waitForRenew('getUserProfile()');
         return this.#userProfile;
@@ -280,6 +295,7 @@ export class OIDCAuthManager extends AuthManager<OIDCAuthSettings> {
     // --- DESTROY ---
 
     public destroy(): void {
+        this.#userSubs.unsubscribe();
         this.#idTokenSubs.unsubscribe();
         this.#accessTokenSubs.unsubscribe();
         this.#userProfileSubs.unsubscribe();
@@ -293,6 +309,10 @@ export class OIDCAuthManager extends AuthManager<OIDCAuthSettings> {
     }
 
     // --- HANDLER(s) ---
+
+    public onUserChanged(handler: AuthSubscriber<User | null | undefined>, options?: AuthSubscriberOptions): AuthSubscription {
+        return this.#userSubs.add(handler, options);
+    }
 
     public onIdTokenChanged(handler: AuthSubscriber<string | undefined>, options?: AuthSubscriberOptions): AuthSubscription {
         return this.#idTokenSubs.add(handler, options);

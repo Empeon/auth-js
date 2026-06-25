@@ -42,7 +42,8 @@ export {
     isCapacitor,
     isCordova,
     isNativeMobile,
-    LogLevel
+    LogLevel,
+    User
 } from '@empeon/auth-js/oidc';
 
 // Library exports

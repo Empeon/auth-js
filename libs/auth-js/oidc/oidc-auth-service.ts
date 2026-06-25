@@ -1,4 +1,4 @@
-import type { UserProfile } from 'oidc-client-ts';
+import type { User, UserProfile } from 'oidc-client-ts';
 
 import type { AuthGuardOptions } from '../core';
 import type { AccessToken } from './models/access-token.model';
@@ -58,6 +58,28 @@ export abstract class OIDCAuthService<T extends OIDCAuthSettings = OIDCAuthSetti
      */
     public getSettings(): T {
         return this.manager.getSettings() as T;
+    }
+
+    /**
+     * @see {@link OIDCAuthManager.getUser}
+     */
+    public async getUser(): Promise<User | null | undefined> {
+        return this.manager.getUser();
+    }
+
+    /**
+     * @param user
+     * @see {@link OIDCAuthManager.storeUser}
+     */
+    public async storeUser(user: User): Promise<void> {
+        return this.manager.storeUser(user);
+    }
+
+    /**
+     * @see {@link OIDCAuthManager.removeUser}
+     */
+    public async removeUser(): Promise<void> {
+        return this.manager.removeUser();
     }
 
     /**

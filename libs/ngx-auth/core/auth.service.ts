@@ -7,6 +7,7 @@ import {
     getBaseUrl,
     type IdToken,
     OIDCAuthService,
+    type User,
     type UserProfile,
     type UserSession
 } from '@empeon/auth-js/oidc';
@@ -21,6 +22,7 @@ import { AUTH_MANAGER } from './auth.provider';
 export class AuthService extends OIDCAuthService implements OnDestroy {
     #authManagerSubs: AuthSubscription[] = [];
 
+    #user$: ReplaySubject<User | null | undefined> = new ReplaySubject<User | null | undefined>(1);
     #idToken$: ReplaySubject<string | undefined> = new ReplaySubject<string | undefined>(1);
     #accessToken$: ReplaySubject<string | undefined> = new ReplaySubject<string | undefined>(1);
     #userProfile$: ReplaySubject<UserProfile | undefined> = new ReplaySubject<UserProfile | undefined>(1);
@@ -43,6 +45,10 @@ export class AuthService extends OIDCAuthService implements OnDestroy {
     }
 
     /* eslint-disable @typescript-eslint/member-ordering */
+    public readonly user$: Observable<User | null | undefined> = this.#user$
+        .asObservable()
+        .pipe(distinctUntilChanged());
+
     public readonly isRenewing$: Observable<boolean> = this.#isRenewing$
         .asObservable()
         .pipe(distinctUntilChanged());
@@ -86,6 +92,11 @@ export class AuthService extends OIDCAuthService implements OnDestroy {
 
     #listenForManagerChanges(): void {
         this.#authManagerSubs.push(
+            this.manager.onUserChanged(value => {
+                this.#ngZone.run(() => {
+                    this.#user$.next(value);
+                });
+            }),
             this.manager.onIdTokenChanged(value => {
                 this.#ngZone.run(() => {
                     this.#idToken$.next(value);
