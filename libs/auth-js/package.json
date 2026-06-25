@@ -45,7 +45,12 @@
     },
     "devDependencies": {
         "@types/lodash-es": "^4.17.12",
-        "@types/cordova": "^11.0.3"
+        "@types/cordova": "^11.0.3",
+        "@capacitor/app": "^5.0.7",
+        "@capacitor/browser": "^5.2.0",
+        "@capacitor/core": "^5.7.4",
+        "@capacitor/preferences": "^5.0.7",
+        "capacitor-secure-storage-plugin": "^0.9.0"
     },
     "publishConfig": {
         "access": "public"
