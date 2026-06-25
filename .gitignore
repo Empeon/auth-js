@@ -38,8 +38,10 @@ testem.log
 .DS_Store
 Thumbs.db
 
-# Claude Code local config
-.claude/
+# Claude Code local config (keep .claude/skills/ tracked)
+.claude/settings.local.json
+.claude/settings.json
+.claude/*.local
 
 # npm auth (contains registry tokens)
 .npmrc
