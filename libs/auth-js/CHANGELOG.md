@@ -1,3 +1,14 @@
+## 2.0.1 (2026-07-22)
+
+### 🐛 Fixes
+
+- prevent invalid_grant replay loops and preserve gated re-entry across sign-out ([17bf417](https://github.com/Empeon/auth-js/commit/17bf417))
+
+### ❤️ Thank You
+
+- Claude Fable 5
+- Mordechai Senderowitz
+
 ## 1.1.6 (2025-11-19)
 
 ### 🐛 Fixes
