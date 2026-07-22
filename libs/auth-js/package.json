@@ -1,6 +1,6 @@
 {
     "name": "@empeon/auth-js",
-    "version": "2.0.0",
+    "version": "2.0.1",
     "description": "Authentication and authorization support for web based desktop and mobile applications.",
     "homepage": "https://github.com/Empeon/auth-js/tree/main/libs/auth-js",
     "license": "GPL-3.0-only",
