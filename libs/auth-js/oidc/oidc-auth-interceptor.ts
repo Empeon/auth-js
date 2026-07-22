@@ -197,8 +197,10 @@ export class OIDCAuthInterceptor {
 
                 XMLHttpRequest.prototype.open = function(method: string, url: string | URL, ...rest: unknown[]): void {
                     this.url = url;
-                    // @ts-expect-error Rest should not be of type unknown
-                    interceptor.#originalXmlHttpRequestOpen.apply(this, [method, url, ...rest]);
+                    // `rest` is unknown[] while the original `open` has a stricter signature; cast to a
+                    // permissive callable so this type-checks regardless of TS config (a bare call is a
+                    // suppression that some configs flag as used and others as unused).
+                    (interceptor.#originalXmlHttpRequestOpen as (...args: unknown[]) => void).apply(this, [method, url, ...rest]);
                 };
 
                 XMLHttpRequest.prototype.send = function(body?: Document | XMLHttpRequestBodyInit | null): void {

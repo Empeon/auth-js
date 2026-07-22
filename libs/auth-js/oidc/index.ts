@@ -37,6 +37,7 @@ export type { InjectToken } from './models/inject-token.model';
 export type { InjectTokenPattern } from './models/inject-token-pattern.model';
 export type { MobileWindowParams } from './models/mobile-window-params.model';
 export type { OIDCAuthSettings } from './models/oidc-auth-settings.model';
+export type { SecureStorage } from './models/secure-storage.model';
 export type { UserSession } from './models/user-session.model';
 export { OIDCAuthManager } from './oidc-auth-manager';
 export { OIDCAuthService } from './oidc-auth-service';

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable @typescript-eslint/naming-convention, camelcase */
 
-import { UserManager, type UserManagerSettings } from 'oidc-client-ts';
+import { type SigninSilentArgs, type User, UserManager, type UserManagerSettings } from 'oidc-client-ts';
 
 import { MobileNavigator } from './mobile/mobile-navigator';
 import type { SigninMobileArgs, SignoutMobileArgs } from './models/args.model';
@@ -14,6 +14,18 @@ import type { OIDCAuthSettings } from './models/oidc-auth-settings.model';
  */
 export class OIDCUserManager extends UserManager {
     #mobileNavigator!: MobileNavigator;
+    #renewPromise: Promise<User | null> | null = null;
+
+    /**
+     * The in-flight silent renew, if any (`null` otherwise). Exposed so flows that must not run
+     * concurrently with a token rotation — e.g. snapshotting the stored session during
+     * `logout({ preserveStoredUser: true })` — can await its settlement first, instead of
+     * capturing a mid-rotation (about-to-be-consumed) refresh token.
+     * @returns The pending renew promise, or `null` when no renew is in flight.
+     */
+    public get pendingRenew(): Promise<User | null> | null {
+        return this.#renewPromise;
+    }
 
     public constructor(
         public libSettings: OIDCAuthSettings
@@ -28,6 +40,58 @@ export class OIDCUserManager extends UserManager {
         } as UserManagerSettings);
 
         this.#mobileNavigator = new MobileNavigator();
+    }
+
+    /**
+     * Single-flight guard around silent renew.
+     *
+     * With refresh-token rotation (RefreshTokenUsage.OneTimeOnly) a second refresh
+     * issued in parallel reuses an already-rotated token, which the OP treats as reuse
+     * -> `invalid_grant` and revocation of the whole token family. Both the
+     * `automaticSilentRenew` timer (SilentRenewService calls `signinSilent` here
+     * directly) and every manual `renew()` (via OIDCAuthManager) funnel through this
+     * method, so coalescing concurrent calls onto one in-flight request closes the race
+     * for all callers (e.g. the biometric auto-login racing the token-expiry timer).
+     *
+     * Concurrent callers intentionally share the in-flight request (and thus the first
+     * caller's `args`): under rotation two refreshes cannot run in parallel regardless
+     * of args, so a renew must never start a second token request while one is pending.
+     * Callers needing distinct token params must await the current renew first. (In
+     * practice `renew()` is always called with no args.)
+     * @param args Optional silent sign-in arguments (shared by concurrent callers, see above).
+     * @returns The renewed user, or `null` when the renew yields none.
+     */
+    public override async signinSilent(args?: SigninSilentArgs): Promise<User | null> {
+        if (this.#renewPromise) {
+            return this.#renewPromise;
+        }
+        this.#renewPromise = (async (): Promise<User | null> => {
+            try {
+                return await super.signinSilent(args);
+            } finally {
+                this.#renewPromise = null;
+            }
+        })();
+        return this.#renewPromise;
+    }
+
+    /**
+     * Pure store read: loads the persisted user WITHOUT the side effects of `getUser()`.
+     * `getUser()` calls `_events.load(user, false)`, whose `super.load(user)` schedules the
+     * access-token-expiring timer (→ a background `signinSilent`) even with `raiseEvent = false`.
+     * On native (`retrieveUserSession: false`) we deliberately avoid arming that at cold start, so
+     * callers that only want to *check* for a stored session (e.g. biometric unlock) use this.
+     * @returns The user persisted in the OIDC store, or `null` when none is stored (or readable).
+     */
+    public async loadStoredUser(): Promise<User | null> {
+        try {
+            return await this._loadUser();
+        } catch (error) {
+            // A corrupt / legacy / unreadable record must degrade to "no stored session" (the
+            // contract callers rely on for a clean interactive-login fallback), never a rejection.
+            this._logger.create('loadStoredUser').warn('stored user could not be read, treating as none:', error);
+            return null;
+        }
     }
 
     /* public async readRequestTypeFromState(url = location.href): Promise<string | null> {

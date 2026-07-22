@@ -45,6 +45,7 @@ export class OIDCAuthManager extends AuthManager<OIDCAuthSettings> {
     #userSession?: UserSession;
     #isAuthenticated = false;
     #isRenewing = false;
+    #silentRenewDeferred = false;
 
     #userManager?: OIDCUserManager;
     #settings = DEFAULT_SETTINGS as OIDCAuthSettings;
@@ -67,6 +68,15 @@ export class OIDCAuthManager extends AuthManager<OIDCAuthSettings> {
                 session_state: value.session_state
             } : undefined;
             this.#isAuthenticated = !!(value && !value.expired);
+
+            // Silent renew was deferred at construction (session not restored at startup):
+            // start it now that a session is actually established. One-shot — the service
+            // stays subscribed for the lifetime of the manager, exactly as if it had been
+            // started by the UserManager ctor.
+            if (this.#silentRenewDeferred && this.#isAuthenticated) {
+                this.#silentRenewDeferred = false;
+                this.#userManager?.startSilentRenew();
+            }
 
             this.#userSubs.notify(this.#user);
             this.#idTokenSubs.notify(this.#idToken);
@@ -94,12 +104,17 @@ export class OIDCAuthManager extends AuthManager<OIDCAuthSettings> {
          */
         const baseUrl = (isNativeMobilePlatform) ? `${userSettings.mobileScheme!}://localhost/` : getBaseUrl();
 
+        // A consumer can inject its own persistent store via `secureStorage` (e.g. a chunking or AES
+        // Capacitor wrapper on native). Otherwise the package falls back to its built-in store:
+        // MobileStorage on native (Capacitor secure-storage / preferences / localStorage), in-memory
+        // on web/desktop.
+        const store = userSettings.secureStorage
+            ?? ((isNativeMobilePlatform) ? new MobileStorage() : new InMemoryWebStorage());
+
         // Initialize settings
         this.#settings = merge({}, DEFAULT_SETTINGS, {
             internal: {
-                userStore: new WebStorageStateStore({
-                    store: (isNativeMobilePlatform) ? new MobileStorage() : new InMemoryWebStorage()
-                }),
+                userStore: new WebStorageStateStore({ store }),
                 redirect_uri: `${baseUrl}${DEFAULT_SETTINGS.internal.redirect_uri}`,
                 post_logout_redirect_uri: `${baseUrl}${DEFAULT_SETTINGS.internal.post_logout_redirect_uri}`,
                 popup_redirect_uri: `${baseUrl}${DEFAULT_SETTINGS.internal.popup_redirect_uri}`,
@@ -111,8 +126,21 @@ export class OIDCAuthManager extends AuthManager<OIDCAuthSettings> {
         // Make sure we are not trapped in the inception loop
         this.#assertNotInInceptionLoop();
 
+        // A background renew loop must not run against a session the app has declared
+        // not-restored (`retrieveUserSession: false` and no `loginRequired`): the UserManager
+        // ctor would otherwise start SilentRenewService, which reads the persisted user straight
+        // from the store — bypassing the "not restored" decision — and replays a possibly dead
+        // (already-rotated) refresh token on the signin screen (`invalid_grant` loop). Defer
+        // automatic silent renew until a session is actually established, then start it once
+        // (see the `user` setter).
+        this.#silentRenewDeferred = !!this.#settings.automaticSilentRenew
+            && !this.#settings.retrieveUserSession
+            && !this.#settings.loginRequired;
+
         // Configure the user manager
-        this.#userManager = new OIDCUserManager(this.#settings);
+        this.#userManager = new OIDCUserManager(this.#silentRenewDeferred
+            ? { ...this.#settings, automaticSilentRenew: false }
+            : this.#settings);
 
         // Configure the interceptor
         if (this.#settings.automaticLoginOn401 || this.#settings.automaticInjectToken) {
@@ -133,8 +161,20 @@ export class OIDCAuthManager extends AuthManager<OIDCAuthSettings> {
                     }
                 }
             }),
-            this.#userManager.events.addSilentRenewError(async () => {
-                await this.#removeUser();
+            this.#userManager.events.addSilentRenewError(async (error: Error) => {
+                // Only wipe on a definitive renew failure (see #isDefinitiveRenewError). Transient
+                // failures (offline, network, 5xx) must NOT destroy the stored session — it is the
+                // single source of truth, so the next renew can recover.
+                //
+                // Caveat: preserving the session on a transient failure leaves the cached
+                // `#isAuthenticated` stale-true until the next renew (nothing here reacts to the access
+                // token actually expiring). That is safe for consumers running `loginRequired: false` +
+                // `automaticLoginOn401: false` (they don't rely on this handler to force re-login and
+                // handle 401s themselves) — the current consumers. A `loginRequired: true` /
+                // `automaticLoginOn401: true` consumer using the built-in interceptor should first make
+                // `#isAuthenticated` reflect token expiry (derive it live, or react to
+                // `addAccessTokenExpired`) so a stale-true value can't suppress the 401 re-login.
+                await this.#removeUserOnDefinitiveRenewError(error);
             })
         );
 
@@ -167,7 +207,12 @@ export class OIDCAuthManager extends AuthManager<OIDCAuthSettings> {
                                 await this.login();
                             } else {
                                 logger.warn('User\'s session cannot be retrieved:', message);
-                                this.#authenticatedSubs.notify(false);
+                                // Surface the signed-out state through the user setter: `user$`-style
+                                // streams are fed solely by it, so leaving `user` unassigned here
+                                // (e.g. after a transient failure that preserved the store) would
+                                // mean late subscribers never receive any emission. Memory-only —
+                                // the persisted session is NOT wiped.
+                                this.user = null;
                                 if (this.#settings.loginRequired) {
                                     throw signinSilentError;
                                 }
@@ -190,12 +235,13 @@ export class OIDCAuthManager extends AuthManager<OIDCAuthSettings> {
 
     public async logout(args?: LogoutArgs): Promise<void> {
         const redirectUrl = args?.redirectUrl ?? location.href;
+        const preserveStoredUser = args?.preserveStoredUser ?? false;
         if (isNativeMobile()) {
-            await this.#callSignout(() => this.#userManager!.signoutMobile(args), redirectUrl);
+            await this.#callSignout(() => this.#userManager!.signoutMobile(args), redirectUrl, preserveStoredUser);
         } else {
             switch (args?.desktopNavigationType ?? this.#settings.desktopNavigationType) {
                 case DesktopNavigation.POPUP:
-                    await this.#callSignout(() => this.#userManager!.signoutPopup(args), redirectUrl);
+                    await this.#callSignout(() => this.#userManager!.signoutPopup(args), redirectUrl, preserveStoredUser);
                     break;
                 case DesktopNavigation.REDIRECT:
                 default:
@@ -252,6 +298,21 @@ export class OIDCAuthManager extends AuthManager<OIDCAuthSettings> {
     public async getUser(): Promise<User | null | undefined> {
         await this.#waitForRenew('getUser()');
         return this.#user;
+    }
+
+    /**
+     * Reads the user persisted in the OIDC store (as opposed to `getUser()`, which returns the
+     * in-memory user). On native, `retrieveUserSession: false` leaves the in-memory user null at
+     * cold start, so a caller (e.g. a biometric unlock) uses this to decide whether there is a
+     * stored session to `renew()` from — without reaching into the internal store key. Returns
+     * `null` when nothing is persisted (or when a legacy record can't be read back after a storage
+     * migration), so callers can cleanly fall back to interactive login instead of triggering the
+     * (native-unusable) silent-renew iframe on an empty store.
+     * @returns The user persisted in the OIDC store, or `null` when none is stored (or readable).
+     */
+    public async getStoredUser(): Promise<User | null> {
+        await this.#waitForRenew('getStoredUser()');
+        return (await this.#userManager?.loadStoredUser()) ?? null;
     }
 
     public async storeUser(user: User): Promise<void> {
@@ -373,7 +434,7 @@ export class OIDCAuthManager extends AuthManager<OIDCAuthSettings> {
 
     /**
      * Waits for a renew to finish or times out after 5s.
-     * @param caller
+     * @param caller Name of the calling method, used in the timeout log message.
      * @example
      * 1) isNativeMobile = true + app is in background
      * 2) access token expires
@@ -397,7 +458,7 @@ export class OIDCAuthManager extends AuthManager<OIDCAuthSettings> {
 
     /**
      * Triggers a re-login after a logout (if required).
-     * @param redirectUrlAskedAfterLogout
+     * @param redirectUrlAskedAfterLogout The redirect url that was requested along with the logout.
      * @example
      * 1) user is at http://my-app.com, logged-in and loginRequired=true
      * 2) user triggers a logout and gets redirected to '/'
@@ -448,13 +509,46 @@ export class OIDCAuthManager extends AuthManager<OIDCAuthSettings> {
         ]);
     }
 
+    /**
+     * True only for a definitive renew failure:
+     * - `invalid_grant` — the token endpoint rejected the refresh token (consumed / rotated-away /
+     *   revoked / expired token family);
+     * - `login_required` / `consent_required` / `interaction_required` — the authorize endpoint
+     *   (silent iframe path) demands user interaction, i.e. the OP session is gone and a silent
+     *   renew can never recover on its own.
+     * Network / timeout / 5xx failures return false so the persisted session is preserved for the
+     * next renew instead of being eagerly wiped.
+     * @param error The error thrown by a failed renew.
+     * @returns Whether the error definitively ends the session.
+     */
+    #isDefinitiveRenewError(error: unknown): boolean {
+        const code = (error as Partial<ErrorResponse> | undefined)?.error;
+        return (code === 'invalid_grant') || (code === 'login_required')
+            || (code === 'consent_required') || (code === 'interaction_required');
+    }
+
+    /**
+     * Single wipe policy shared by both renew-failure sites — the `silentRenewError` event handler
+     * (automatic renews) and `#signinSilent`'s catch (manual renews); each sees failures the other
+     * doesn't, so both must apply the same rule.
+     * @param error The error thrown by a failed renew.
+     */
+    async #removeUserOnDefinitiveRenewError(error: unknown): Promise<void> {
+        if (this.#isDefinitiveRenewError(error)) {
+            await this.#removeUser();
+        }
+    }
+
     async #signinSilent(args?: SigninSilentArgs): Promise<void> {
         this.#notifyRenew(true);
 
         try {
             await this.#userManager?.signinSilent(args);
         } catch (error) {
-            await this.#removeUser();
+            // Wipe only on a definitive rejection (see #isDefinitiveRenewError). A transient
+            // failure must leave the stored session intact so the next renew can recover —
+            // critical now that the OIDC store is the single source of truth (no biometric copy).
+            await this.#removeUserOnDefinitiveRenewError(error);
             throw error;
         } finally {
             this.#notifyRenew(false);
@@ -481,8 +575,31 @@ export class OIDCAuthManager extends AuthManager<OIDCAuthSettings> {
         }
     }
 
-    async #callSignout(managerCall: () => Promise<unknown>, redirectUrl: string | null): Promise<void> {
+    async #callSignout(managerCall: () => Promise<unknown>, redirectUrl: string | null, preserveStoredUser = false): Promise<void> {
+        let preservedUser: User | null = null;
         try {
+            if (preserveStoredUser) {
+                // Preserve the persisted session across the sign-out: oidc-client's `_signoutStart`
+                // wipes the user store internally (and `#removeUser` would wipe it again after), so
+                // a snapshot is taken first and written back once the sign-out completes — the IDP
+                // session is properly ended and the in-memory session cleared, but a gated re-entry
+                // (e.g. biometric unlock -> `getStoredUser()` -> `renew()`) keeps working.
+                //
+                // Order matters:
+                // 1) Stop the background renew loop BEFORE snapshotting — a pending silent-renew
+                //    retry (armed by an offline timeout) survives `_events.unload()` and would
+                //    otherwise renew off the restored session after the sign-out, silently
+                //    re-authenticating with no gate. Re-arm the deferred-start flag so the next
+                //    established session starts the loop again (see the `user` setter).
+                // 2) Await any in-flight renew — snapshotting mid-rotation would capture an
+                //    already-consumed refresh token and restore THAT (guaranteed `invalid_grant`
+                //    + token-family revocation on its next use).
+                this.#userManager?.stopSilentRenew();
+                this.#silentRenewDeferred = !!this.#settings.automaticSilentRenew;
+                await this.#userManager?.pendingRenew?.catch(() => null);
+                preservedUser = (await this.#userManager?.loadStoredUser()) ?? null;
+            }
+
             await managerCall().catch((err: unknown) => {
                 const error = err as Error;
                 if (error.message === 'Attempted to navigate on a disposed window') {
@@ -491,14 +608,44 @@ export class OIDCAuthManager extends AuthManager<OIDCAuthSettings> {
                 }
                 throw error;
             });
+            if (preservedUser) {
+                // Restore before redirecting so the store is complete by the time the app
+                // lands on its post-logout page (which may immediately probe the store).
+                await this.#restorePreservedUser(preservedUser);
+            }
             await this.#redirect(redirectUrl);
-            await this.#removeUser();
+            if (preservedUser) {
+                this.user = null;
+            } else {
+                await this.#removeUser();
+            }
         } catch (error) {
+            // Wipe first, then restore the snapshot (the sign-out failed — e.g. the user closed
+            // the browser — so the store state is unknown), and only then notify redirect
+            // subscribers: a post-logout page may probe the store as soon as the redirect lands.
+            logger.error(error);
+            await this.#removeUser();
+            if (preservedUser) {
+                await this.#restorePreservedUser(preservedUser);
+            }
             redirectUrl = '/';
-            await this.#redirect(redirectUrl, error);
+            await this.#redirect(redirectUrl);
             throw error;
         } finally {
             this.#postLogoutVerification(redirectUrl);
+        }
+    }
+
+    /**
+     * Best-effort write-back of the preserved session after a sign-out: a failing store write
+     * must not turn a completed sign-out into an error (and must never shadow an original one).
+     * @param user The session snapshot taken before the sign-out.
+     */
+    async #restorePreservedUser(user: User): Promise<void> {
+        try {
+            await this.#userManager?.storeUser(user);
+        } catch (error) {
+            logger.error('Failed to restore the preserved session after sign-out:', error);
         }
     }
 }

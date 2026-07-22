@@ -7,5 +7,12 @@ export default {
         '^.+\\.[tj]s$': ['ts-jest', { tsconfig: '<rootDir>/tsconfig.spec.json' }],
     },
     moduleFileExtensions: ['ts', 'js', 'html'],
+    moduleNameMapper: {
+        // lodash-es is ESM-only; map to the CJS twin so jest doesn't need to transform it
+        '^lodash-es$': 'lodash',
+        // mirror the workspace tsconfig path aliases (self-references inside the lib)
+        '^@empeon/auth-js$': '<rootDir>/core',
+        '^@empeon/auth-js/oidc$': '<rootDir>/oidc',
+    },
     coverageDirectory: '../../coverage/libs/auth-js',
 };

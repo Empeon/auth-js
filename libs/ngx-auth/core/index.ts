@@ -30,6 +30,7 @@ export type {
     LogoutArgs,
     MobileWindowParams,
     RenewArgs,
+    SecureStorage,
     SigninMobileArgs,
     SignoutMobileArgs,
     UserProfile,

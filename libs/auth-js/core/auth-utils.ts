@@ -61,6 +61,7 @@ export const isUrlMatching = (url1: string, url2?: string): boolean => {
 };
 
 /**
+ * @returns The application base url, always ending with a trailing slash.
  * @internal
  */
 export const getBaseUrl = (): string => {
@@ -71,7 +72,8 @@ export const getBaseUrl = (): string => {
 };
 
 /**
- * @param url
+ * @param url An absolute url, or an app-relative path.
+ * @returns The parsed URL (relative paths are resolved against the application base url).
  * @internal
  */
 // eslint-disable-next-line @typescript-eslint/naming-convention

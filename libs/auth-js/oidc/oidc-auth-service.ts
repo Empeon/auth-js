@@ -16,7 +16,8 @@ export abstract class OIDCAuthService<T extends OIDCAuthSettings = OIDCAuthSetti
     }
 
     /**
-     * @param args
+     * @param args Optional sign-in arguments (redirect url, navigation type, mobile window params).
+     * @returns Whether the user is authenticated once the sign-in flow completes.
      * @see {@link OIDCAuthManager.login}
      */
     public async login(args?: LoginArgs): Promise<boolean> {
@@ -24,7 +25,8 @@ export abstract class OIDCAuthService<T extends OIDCAuthSettings = OIDCAuthSetti
     }
 
     /**
-     * @param args
+     * @param args Optional sign-out arguments (redirect url, navigation type, mobile window params).
+     * @returns A promise that resolves once the sign-out flow completes.
      * @see {@link OIDCAuthManager.logout}
      */
     public async logout(args?: LogoutArgs): Promise<void> {
@@ -32,7 +34,8 @@ export abstract class OIDCAuthService<T extends OIDCAuthSettings = OIDCAuthSetti
     }
 
     /**
-     * @param args
+     * @param args Optional renew arguments.
+     * @returns A promise that resolves once the renew attempt completes.
      * @see {@link OIDCAuthManager.renew}
      */
     public async renew(args?: RenewArgs): Promise<void> {
@@ -40,6 +43,7 @@ export abstract class OIDCAuthService<T extends OIDCAuthSettings = OIDCAuthSetti
     }
 
     /**
+     * @returns Whether a token renew is currently in progress.
      * @see {@link OIDCAuthManager.isRenewing}
      */
     public isRenewing(): boolean {
@@ -47,6 +51,7 @@ export abstract class OIDCAuthService<T extends OIDCAuthSettings = OIDCAuthSetti
     }
 
     /**
+     * @returns Whether the current user is authenticated.
      * @see {@link OIDCAuthManager.isAuthenticated}
      */
     public async isAuthenticated(): Promise<boolean> {
@@ -54,6 +59,7 @@ export abstract class OIDCAuthService<T extends OIDCAuthSettings = OIDCAuthSetti
     }
 
     /**
+     * @returns The settings the auth manager was initialized with.
      * @see {@link OIDCAuthManager.getSettings}
      */
     public getSettings(): T {
@@ -61,6 +67,7 @@ export abstract class OIDCAuthService<T extends OIDCAuthSettings = OIDCAuthSetti
     }
 
     /**
+     * @returns The in-memory user, or `null`/`undefined` when signed out.
      * @see {@link OIDCAuthManager.getUser}
      */
     public async getUser(): Promise<User | null | undefined> {
@@ -68,7 +75,16 @@ export abstract class OIDCAuthService<T extends OIDCAuthSettings = OIDCAuthSetti
     }
 
     /**
-     * @param user
+     * @returns The user persisted in the OIDC store, or `null` when none is stored (or readable).
+     * @see {@link OIDCAuthManager.getStoredUser}
+     */
+    public async getStoredUser(): Promise<User | null> {
+        return this.manager.getStoredUser();
+    }
+
+    /**
+     * @param user The user to persist in the OIDC store.
+     * @returns A promise that resolves once the user is persisted.
      * @see {@link OIDCAuthManager.storeUser}
      */
     public async storeUser(user: User): Promise<void> {
@@ -76,6 +92,7 @@ export abstract class OIDCAuthService<T extends OIDCAuthSettings = OIDCAuthSetti
     }
 
     /**
+     * @returns A promise that resolves once the user is removed from memory and the OIDC store.
      * @see {@link OIDCAuthManager.removeUser}
      */
     public async removeUser(): Promise<void> {
@@ -83,6 +100,7 @@ export abstract class OIDCAuthService<T extends OIDCAuthSettings = OIDCAuthSetti
     }
 
     /**
+     * @returns The current user's profile claims, or `undefined` when signed out.
      * @see {@link OIDCAuthManager.getUserProfile}
      */
     public async getUserProfile(): Promise<UserProfile | undefined> {
@@ -90,6 +108,7 @@ export abstract class OIDCAuthService<T extends OIDCAuthSettings = OIDCAuthSetti
     }
 
     /**
+     * @returns The current user's session info, or `undefined` when signed out.
      * @see {@link OIDCAuthManager.getUserSession}
      */
     public async getUserSession(): Promise<UserSession | undefined> {
@@ -97,6 +116,7 @@ export abstract class OIDCAuthService<T extends OIDCAuthSettings = OIDCAuthSetti
     }
 
     /**
+     * @returns The current id token, or `undefined` when signed out.
      * @see {@link OIDCAuthManager.getIdToken}
      */
     public async getIdToken(): Promise<string | undefined> {
@@ -104,6 +124,7 @@ export abstract class OIDCAuthService<T extends OIDCAuthSettings = OIDCAuthSetti
     }
 
     /**
+     * @returns The decoded id token, the raw string when it cannot be decoded, or `undefined` when signed out.
      * @see {@link OIDCAuthManager.getIdTokenDecoded}
      */
     public async getIdTokenDecoded(): Promise<IdToken | string | undefined> {
@@ -111,6 +132,7 @@ export abstract class OIDCAuthService<T extends OIDCAuthSettings = OIDCAuthSetti
     }
 
     /**
+     * @returns The current access token, or `undefined` when signed out.
      * @see {@link OIDCAuthManager.getAccessToken}
      */
     public async getAccessToken(): Promise<string | undefined> {
@@ -118,6 +140,7 @@ export abstract class OIDCAuthService<T extends OIDCAuthSettings = OIDCAuthSetti
     }
 
     /**
+     * @returns The decoded access token, the raw string when it cannot be decoded, or `undefined` when signed out.
      * @see {@link OIDCAuthManager.getAccessTokenDecoded}
      */
     public async getAccessTokenDecoded(): Promise<AccessToken | string | undefined> {
@@ -125,8 +148,9 @@ export abstract class OIDCAuthService<T extends OIDCAuthSettings = OIDCAuthSetti
     }
 
     /**
-     * @param toUrl
-     * @param options
+     * @param toUrl The url being navigated to.
+     * @param options Optional guard options (validator, not-allowed redirect url).
+     * @returns Whether the navigation is allowed, or a url to redirect to instead.
      * @see {@link OIDCAuthManager.runGuard}
      */
     public async runGuard(toUrl: string, options?: AuthGuardOptions): Promise<string | boolean> {

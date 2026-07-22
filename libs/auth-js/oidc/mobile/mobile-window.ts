@@ -23,7 +23,7 @@ export class MobileWindow implements IWindow {
     // eslint-disable-next-line @typescript-eslint/naming-convention
     #originalHandleOpenURL = window.handleOpenURL;
 
-    #timer?: number;
+    #timer?: ReturnType<typeof setTimeout>;
     #resolve?: (value: NavigateResponse) => void;
     #reject?: (reason?: unknown) => void;
     #isClosed = true;
